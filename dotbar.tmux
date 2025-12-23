@@ -42,16 +42,22 @@ status_right=$("$right_state" && get_tmux_option "@tmux-dotbar-status-right" "#[
 
 base_window_format=$(get_tmux_option "@tmux-dotbar-window-status-format" ' #W ')
 
-ssh_icon=$(get_tmux_option "@tmux-dotbar-ssh-icon" '')
+ssh_enabled=$(get_tmux_option "@tmux-dotbar-ssh-enabled" true)
 
-ssh_icon_only=$(get_tmux_option "@tmux-dotbar-ssh-icon-only" false)
-if [ "$ssh_icon_only" = true ]; then
-  ssh_window_format=" ${ssh_icon} "
+if [ "$ssh_enabled" = true ]; then
+  ssh_icon=$(get_tmux_option "@tmux-dotbar-ssh-icon" '󰌘')
+  ssh_icon_only=$(get_tmux_option "@tmux-dotbar-ssh-icon-only" false)
+
+  if [ "$ssh_icon_only" = true ]; then
+    ssh_window_format=" ${ssh_icon}${base_window_format}"
+  else
+    ssh_window_format=" ${ssh_icon} #(host=\$(echo '#{pane_title}' | sed 's/^ssh //; s/ .*//; s/.*@//; s/:.*//'); if echo \"\$host\" | grep -qE '^[0-9.]+\$|^[0-9]'; then echo '#W'; else echo \"\$host\"; fi | cut -c1-20) "
+  fi
+
+  window_status_format="#{?#{==:#{pane_current_command},ssh},${ssh_window_format},${base_window_format}}"
 else
-  ssh_window_format=" ${ssh_icon} #(host=\$(echo '#{pane_title}' | sed 's/^ssh //; s/ .*//; s/.*@//; s/:.*//'); if echo \"\$host\" | grep -qE '^[0-9.]+\$|^[0-9]'; then echo '#W'; else echo \"\$host\"; fi | cut -c1-20) "
+  window_status_format="${base_window_format}"
 fi
-
-window_status_format="#{?#{==:#{pane_current_command},ssh},${ssh_window_format},${base_window_format}}"
 window_status_separator=$(get_tmux_option "@tmux-dotbar-window-status-separator" ' • ')
 
 maximized_pane_icon=$(get_tmux_option "@tmux-dotbar-maximized-icon" '󰊓')
