@@ -31,14 +31,16 @@ justify=$(get_tmux_option "@tmux-dotbar-justify" "absolute-centre")
 left_state=$(get_tmux_option "@tmux-dotbar-left" true)
 
 # Conditionally apply 'nobold' if @tmux-dotbar-bold-status is true
+base_status_left=$("$left_state" && get_tmux_option "@tmux-dotbar-status-left" "#S")
 if [ "$bold_status" = true ]; then
-  status_left=$("$left_state" && get_tmux_option "@tmux-dotbar-status-left" "#[bg=$bg,fg=$fg_session]#{?client_prefix,, #S }#[bg=$fg_prefix,fg=$bg,nobold]#{?client_prefix, #S ,}#[bg=$bg,fg=${fg_session}]")
+  status_left="#[bg=$bg,fg=$fg_session]#{?client_prefix,, ${base_status_left} }#[bg=$fg_prefix,fg=$bg,nobold]#{?client_prefix, ${base_status_left} ,}#[bg=$bg,fg=${fg_session}]"
 else
-  status_left=$("$left_state" && get_tmux_option "@tmux-dotbar-status-left" "#[bg=$bg,fg=$fg_session]#{?client_prefix,, #S }#[bg=$fg_prefix,fg=$bg,bold]#{?client_prefix, #S ,}#[bg=$bg,fg=${fg_session}]")
+  status_left="#[bg=$bg,fg=$fg_session]#{?client_prefix,, ${base_status_left} }#[bg=$fg_prefix,fg=$bg,bold]#{?client_prefix, ${base_status_left} ,}#[bg=$bg,fg=${fg_session}]"
 fi
 
 right_state=$(get_tmux_option "@tmux-dotbar-right" false)
-status_right=$("$right_state" && get_tmux_option "@tmux-dotbar-status-right" "#[bg=$bg,fg=$fg_session] %H:%M #[bg=$bg,fg=${fg_session}]")
+base_status_right=$("$right_state" && get_tmux_option "@tmux-dotbar-status-right" "%H:%M")
+status_right="#[bg=$bg,fg=$fg_session] ${base_status_right} #[bg=$bg,fg=${fg_session}]"
 
 base_window_format=$(get_tmux_option "@tmux-dotbar-window-status-format" ' #W ')
 
